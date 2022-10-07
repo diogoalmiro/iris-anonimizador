@@ -1,5 +1,5 @@
 #!/BackupDisk_Raid1/bak_home/dalmiro/anonimizador/env/bin/python3
-from flask import Flask, request, Response, jsonify
+from flask import Flask, request, Response, jsonify, send_from_directory
 from flask_cors import CORS
 import os
 import tempfile
@@ -8,7 +8,7 @@ import re
 from specific_spacy import nlp
 import csv
 
-app = Flask(__name__)
+app = Flask(__name__, static_folder="build")
 CORS(app)
 
 
@@ -61,67 +61,17 @@ def process_simple_line(line, entpool: EntPool):
 	rline += line[lastI:]
 	return rline
 
-@app.route("/",methods=["GET"])
-def send_index():
-	return """
-<!DOCTYPE html>
-	<html lang="en">
-		<head>
-			<meta charset="UTF-8">
-			<meta http-equiv="X-UA-Compatible" content="IE=edge">
-			<meta name="viewport" content="width=device-width, initial-scale=1.0">
-		</head>
-		<body>
-			<h3>Interface testes anonimizador</h3>
-			<h4>Input</h4>
-			<form class="col-12 col-sm-6" id="anonim-form" action="http://localhost:7998/" method="post">
-				<input type="file" name="file"><button type="submit">Correr a partir de ficheiro</button></form>
-			<form class="col-12 col-sm-6" id="anonim-form-text" action="http://localhost:7998/" method="post">
-				<textarea class="w-100" name="file"></textarea>
-				<button type="submit">Correr este texto</button>
-			</form>
-			<h4>Output</h4>
-			<div id="out"></div>
-			<style>
-				mark::before{
-					content: attr(role);
-					font-size: 0.5rem;
-					font-weight: bold;
-					padding: 0.2rem;
-				}
-			</style>
-			<script>
-	document.getElementById("anonim-form").addEventListener("submit", (evt) => {
-    evt.preventDefault();
-    let button = document.getElementById("anonim-form").querySelector("button");
-    button.disabled = true;
-    let formData = new FormData(document.getElementById("anonim-form"));
-    fetch("./", {
-        method: "POST",
-        body: formData
-    }).then(response => response.text()).then(text => {
-        document.getElementById("out").innerHTML = text;
-        button.disabled = false;
-    });
-});
-document.getElementById("anonim-form-text").addEventListener("submit", (evt) => {
-    evt.preventDefault();
-    let button = document.getElementById("anonim-form-text").querySelector("button");
-    button.disabled = true;
-    let formData = new FormData();
-    formData.append("file", new Blob([document.getElementById("anonim-form-text").querySelector("textarea").value]), "text.txt");
-    fetch("./", {
-        method: "POST",
-        body: formData
-    }).then(response => response.text()).then(text => {
-        document.getElementById("out").innerHTML = text;
-        button.disabled = false;
-    });
-});
-			</script>
-		</body>
-	</html>
-"""
+@app.route('/', methods=["GET"], defaults={'path': ''})
+@app.route('/<path:path>', methods=["GET"])
+def send_report(path=None):
+	if path is None:
+		path = "index.html"
+	try:
+		return send_from_directory('build', path)
+	except Exception as e:
+		print(e)
+		return send_from_directory('build', "index.html")
+
 
 @app.route("/", methods=["POST"])
 def handle_post():
