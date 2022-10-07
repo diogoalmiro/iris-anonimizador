@@ -12,6 +12,6 @@ Running with python venv:
 
 Running with docker:
 
- - (build once:)  `docker build .`
- - (running:) `docker run -it -p 8999:8999`
+ - (build once:)  `docker build . -t anonimizador`
+ - (running:) `docker run -it -p 7999:7999 anonimizador`
 
