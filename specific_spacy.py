@@ -69,6 +69,13 @@ def add_ent_by_pattern(ents, text, pattern, label):
             ents.append(FakeEntity(label, start_pos, end_pos, text[start_pos:end_pos]))
     return ents
 
+def remove_pattern(p, ents):
+    new_list = []
+    for e in ents:
+        if not p.match(e.text):
+            new_list.append(e)
+    return new_list
+
 def nlp(text):
     snlp = spacy.load(spacy_model)
     doc = snlp(text)
@@ -80,11 +87,13 @@ def nlp(text):
         reader = csv.DictReader(csvfd, delimiter="\t")
         for r in reader:
             add_ent_by_pattern(ents, text, r['Pattern'], r['Label'])
-    #add_ent_by_pattern(ents, text, PATTERN_MATRICULA, 'MAT')
-    #add_ent_by_pattern(ents, text, PATTERN_PROCESSO, 'PRO')
-    # TODO: add_ent_by_pattern(ents, text, PATTERN_ARTICLE, 'ART')
     
     ents = correct_ent(ents)
+    with open('exclude.csv', 'r') as csvfd:
+        reader = csv.DictReader(csvfd, delimiter="\t")
+        for r in reader:
+            p = re.compile(r['Pattern'])
+            ents = remove_pattern(p, ents)
     ents = sorted(ents,key=lambda x: x.start_char)
     return FakeDoc(ents, doc.text)
 
@@ -101,5 +110,10 @@ def nlp_pipe(texts):
                 add_ent_by_pattern(ents, text, r['Pattern'], r['Label'])
         
         ents = correct_ent(ents)
+        with open('exclude.csv', 'r') as csvfd:
+            reader = csv.DictReader(csvfd, delimiter="\t")
+            for r in reader:
+                p = re.compile(r['Pattern'])
+                ents = remove_pattern(p, ents)
         ents = sorted(ents,key=lambda x: x.start_char)
         yield FakeDoc(ents, doc.text)
