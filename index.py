@@ -3,10 +3,8 @@ from flask import Flask, request, Response, jsonify, send_from_directory
 from flask_cors import CORS
 import os
 import tempfile
-import pypandoc
-import re
-from specific_spacy import nlp
 import csv
+import subprocess
 
 app = Flask(__name__, static_folder="build")
 CORS(app)

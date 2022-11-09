@@ -4,6 +4,9 @@ import sys
 import re
 from specific_spacy import nlp
 
+# TODO: use exclude and patterns file
+import csv
+
 class EntPool:
 	def __init__(self):
 		self.pool = dict()
