@@ -11,18 +11,6 @@ import csv
 app = Flask(__name__, static_folder="build")
 CORS(app)
 
-@app.route('/', methods=["GET"], defaults={'path': ''})
-@app.route('/<path:path>', methods=["GET"])
-def send_report(path=None):
-	if path is None:
-		path = "index.html"
-	try:
-		return send_from_directory('build', path)
-	except Exception as e:
-		print(e)
-		return send_from_directory('build', "index.html")
-
-
 @app.route("/", methods=["POST"])
 def handle_post():
 	_, file_extension = os.path.splitext(request.files["file"].filename)
@@ -57,6 +45,17 @@ def get_types():
 		for r in reader:
 			typesset.add(r['Label'])
 	return jsonify(list(typesset))
+
+@app.route('/', methods=["GET"], defaults={'path': ''})
+@app.route('/<path:path>', methods=["GET"])
+def send_report(path=None):
+	if path is None:
+		path = "index.html"
+	try:
+		return send_from_directory('build', path)
+	except Exception as e:
+		print(e)
+		return send_from_directory('build', "index.html")
 
 if __name__ == '__main__':
 	app.run(host='0.0.0.0',port=7999)
