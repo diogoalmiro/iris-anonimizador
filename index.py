@@ -14,28 +14,28 @@ CORS(app)
 @app.route("/", methods=["POST"])
 def handle_post():
 	_, file_extension = os.path.splitext(request.files["file"].filename)
-    uploaded_file = tempfile.NamedTemporaryFile(suffix=file_extension, delete=False)
-    request.files["file"].save(uploaded_file)
-    uploaded_file.flush()
-    uploaded_file.close()
+	uploaded_file = tempfile.NamedTemporaryFile(suffix=file_extension, delete=False)
+	request.files["file"].save(uploaded_file)
+	uploaded_file.flush()
+	uploaded_file.close()
 
-    #caixa preta
-    resp = subprocess.Popen(f"python black-box-cli.py {uploaded_file.name}", shell=True, stdout=subprocess.PIPE).stdout.read()
-    os.unlink(uploaded_file.name)
-    return resp
+	#caixa preta
+	resp = subprocess.Popen(f"python black-box-cli.py {uploaded_file.name}", shell=True, stdout=subprocess.PIPE).stdout.read()
+	os.unlink(uploaded_file.name)
+	return resp
 
 @app.route("/html", methods=["POST"])
 def handle_post_html():
 	_, file_extension = os.path.splitext(request.files["file"].filename)
-    uploaded_file = tempfile.NamedTemporaryFile(suffix=file_extension, delete=False)
-    request.files["file"].save(uploaded_file)
-    uploaded_file.flush()
-    uploaded_file.close()
+	uploaded_file = tempfile.NamedTemporaryFile(suffix=file_extension, delete=False)
+	request.files["file"].save(uploaded_file)
+	uploaded_file.flush()
+	uploaded_file.close()
 
-    #caixa preta
-    resp = subprocess.Popen(f"python black-box-cli.py {uploaded_file.name} --html-only", shell=True, stdout=subprocess.PIPE).stdout.read()
-    os.unlink(uploaded_file.name)
-    return resp
+	#caixa preta
+	resp = subprocess.Popen(f"python black-box-cli.py {uploaded_file.name} --html-only", shell=True, stdout=subprocess.PIPE).stdout.read()
+	os.unlink(uploaded_file.name)
+	return resp
 
 @app.route("/types", methods=["GET"])
 def get_types():
